@@ -1,141 +1,57 @@
+// ConsumerWidget을 상속받아야 ref를 사용할 수 있음
 import 'package:flutter/material.dart';
-import 'package:nearby_finder_app/detail/detail_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nearby_finder_app/home/home_view_model.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        //
-      },
-      child: Scaffold(
-        backgroundColor: Colors.grey[300],
-        //
-        appBar: AppBar(
-          title: Text('title'),
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ref.watch: homeViewModelProvider의 상태(HomeState)를 지켜보다
+    // 변경되면 HomePage를 다시 빌드함 (rebuild)
+    final homeState = ref.watch(HomeViewModelProvider);
 
-          // TextField(
-
-          //   //
-
-          // ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '최근 글',
-                style: TextStyle(
-                  //
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              SizedBox(height: 20),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: 10,
-                  separatorBuilder: (context, index) => SizedBox(
-                    height: 10,
-                  ),
-                  itemBuilder: (context, index) {
-                    return post();
-                  },
-                ),
-              ),
-            ],
-            //
+    return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          decoration: const InputDecoration(
+            hintText: '지역을 검색해주세요',
+            border: InputBorder.none,
           ),
+          // 검색 버튼을 눌렀을 때
+          onSubmitted: (query) {
+            // ref.read(...).notifier: ViewModel의 매서드를 호출할 때 사용
+            ref.read(HomeViewModelProvider.notifier).search(query);
+          },
         ),
       ),
-    );
-  }
-}
-
-Widget post() {
-  return Builder(
-    builder: (context) {
-      return GestureDetector(
-        onTap: () {
-          //
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return DetailPage();
-              },
-            ),
-          );
-        },
-        child: SizedBox(
-          width: double.infinity,
-          height: 120,
-          // color: Colors.blue,
-          child: Stack(
-            //
-            children: [
-              Positioned(
-                right: 0,
-                width: 140,
-                height: 120,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    'https://picsum.photos/200/300',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                margin: EdgeInsets.only(right: 100),
-
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
+      body: homeState.isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: homeState.locations.length,
+              itemBuilder: (context, index) {
+                final location = homeState.locations[index];
+                return ListTile(
+                  title: Text(location.title),
+                  subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    //
                     children: [
+                      Text(location.roadAddress),
                       Text(
-                        '뿌뿌1',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      Text(
-                        '뿌뿌2' * 15,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        '뿌뿌3' * 5,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        location.category,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
+                  onTap: () {
+                    // TODO: 3번 과제 - 리뷰 페이지로 이동하는 로직 구현
+                  },
+                );
+              },
+            ),
+    );
+  }
 }
