@@ -54,37 +54,45 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: '주요 지역/건물명, 지하철역 검색',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-                hintText: '예: 수원, 스타필드, 강남역',
-              ),
-              onSubmitted: (_) => _performSearch(),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: asyncValue.isLoading ? null : _performSearch,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: '주요 지역/건물명, 지하철역 검색',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                      hintText: '예: 수원, 스타필드, 강남역',
+                    ),
+                    onSubmitted: (_) => _performSearch(),
+                  ),
                 ),
-                child: asyncValue.isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('검색', style: TextStyle(fontSize: 16)),
-              ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: asyncValue.isLoading ? null : _performSearch,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 15,
+                    ),
+                  ),
+                  child: asyncValue.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('검색', style: TextStyle(fontSize: 16)),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20), // 검색창과 결과 목록 사이의 간격
+            // 3. 검색 결과 목록을 담는 Expanded 위젯
             Expanded(
               child: asyncValue.when(
                 data: (locations) {
