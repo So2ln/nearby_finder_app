@@ -34,7 +34,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.location.title} 리뷰'),
+        title: Text(
+          '${widget.location.title} 리뷰',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -42,7 +48,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             child: reviewState.when(
               data: (reviews) {
                 if (reviews.isEmpty) {
-                  return const Center(child: Text('아직 작성된 리뷰가 없습니다.'));
+                  return const Center(
+                    child: Text(
+                      '아직 작성된 리뷰가 없습니다.',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(8.0),
@@ -68,17 +81,16 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10),
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Expanded(
-                    child: TextField(
-                      controller: _reviewController,
-                      decoration: const InputDecoration(
-                        hintText: '리뷰를 남겨주세요.',
-                        border: OutlineInputBorder(),
+                Expanded(
+                  child: TextField(
+                    controller: _reviewController,
+                    decoration: InputDecoration(
+                      hintText: '리뷰를 남겨주세요.',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
                   ),
@@ -95,6 +107,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 30),
         ],
       ),
     );

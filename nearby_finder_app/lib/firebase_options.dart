@@ -85,5 +85,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'nearby-finder-app-2205b.firebasestorage.app',
     measurementId: 'G-E43CJPSRV5',
   );
-
 }
