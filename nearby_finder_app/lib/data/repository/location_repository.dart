@@ -6,11 +6,11 @@ class LocationRepository {
   final String _clientId = 'ZT6dUtxPSqaMlPSq3AKz';
   final String _clientSecret = 'zFscQoFIHV';
 
-  Future<List<Location>> searchLocations(String query) async {
+  Future<List<Location>> searchLocations(String query, {int start = 1}) async {
     try {
       final response = await _dio.get(
         'https://openapi.naver.com/v1/search/local.json',
-        queryParameters: {'query': query, 'display': 10},
+        queryParameters: {'query': query, 'display': 50, 'start': start},
         options: Options(
           headers: {
             'X-Naver-Client-Id': _clientId,
