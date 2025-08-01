@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nearby_finder_app/data/model/review.dart';
 
@@ -15,7 +16,7 @@ class ReviewRepository {
 
       return snapshot.docs.map((doc) => Review.fromFirestore(doc)).toList();
     } catch (e) {
-      print('Error fetching reviews: $e');
+      debugPrint('Error fetching reviews: $e');
       return [];
     }
   }

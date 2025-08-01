@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nearby_finder_app/model/review.dart';
+import 'package:nearby_finder_app/data/model/review.dart';
 
 class ReviewRepository {
   final _firestore = FirebaseFirestore.instance.collection('reviews');

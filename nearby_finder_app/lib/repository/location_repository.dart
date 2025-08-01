@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nearby_finder_app/model/location.dart';
+import 'package:nearby_finder_app/data/model/location.dart';
 
 class LocationRepository {
   final Dio _dio = Dio();
