@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nearby_finder_app/data/model/location.dart';
 
@@ -35,7 +36,13 @@ class LocationRepository {
       }
     } catch (e) {
       // 에러 발생 시 (네트워크 오류 등)
-      print('Search Error: $e');
+      /*
+       print() 사용 시 "Don't invoke 'print'" 경고가 뜨는 이유는 Flutter 린트 규칙(lint rules)때문임.
+       print()는 디버깅 목적으로는 간단하지만, 로그 출력량이 많아질 경우, 출력이 누락되거나 끊겨서
+       특히 ios에서는 print()가 제대로 동작하지 않는 경우가 많음.
+       그래서 flutter는 debugPrint()를 권장함
+        */
+      debugPrint('Search Error: $e');
       rethrow; // 에러를 다시 던져서 호출한 곳에서 처리할 수 있게 함
     }
   }
