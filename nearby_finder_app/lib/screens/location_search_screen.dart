@@ -38,6 +38,17 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
         title: const Text('주소 검색'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.gps_fixed),
+            onPressed: () {
+              // viewmodel의 현재 위치 검색 메서드 호출
+              ref
+                  .read(locationViewModelProvider.notifier)
+                  .searchCurrentLocation();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
