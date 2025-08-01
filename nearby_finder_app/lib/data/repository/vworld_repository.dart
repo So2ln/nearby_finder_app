@@ -21,10 +21,10 @@ class VworldRepository {
         'type': 'ROAD',
         'zipcode': 'false',
       };
-      
+
       debugPrint('VWORLD API 요청 URL: $_apiUrl');
       debugPrint('VWORLD API 파라미터: $queryParams');
-      
+
       final response = await _dio.get(
         _apiUrl,
         queryParameters: queryParams,
@@ -39,7 +39,7 @@ class VworldRepository {
         // 응답 구조 확인
         if (responseData['response'] != null) {
           debugPrint('Response status: ${responseData['response']['status']}');
-          
+
           if (responseData['response']['status'] == 'OK' &&
               responseData['response']['result'] != null &&
               responseData['response']['result'].isNotEmpty) {

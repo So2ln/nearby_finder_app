@@ -57,10 +57,10 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
             TextField(
               controller: _controller,
               decoration: const InputDecoration(
-                labelText: '도로명 주소 또는 지번 주소',
+                labelText: '주요 지역/건물명, 지하철역 검색',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.search),
-                hintText: '예: 강남대로 123',
+                hintText: '예: 수원, 스타필드, 강남역',
               ),
               onSubmitted: (_) => _performSearch(),
             ),

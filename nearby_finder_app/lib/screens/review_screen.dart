@@ -71,12 +71,15 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _reviewController,
-                    decoration: const InputDecoration(
-                      hintText: '리뷰를 남겨주세요.',
-                      border: OutlineInputBorder(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Expanded(
+                    child: TextField(
+                      controller: _reviewController,
+                      decoration: const InputDecoration(
+                        hintText: '리뷰를 남겨주세요.',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                 ),

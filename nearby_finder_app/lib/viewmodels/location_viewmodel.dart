@@ -65,45 +65,58 @@ class LocationViewModel extends AsyncNotifier<List<Location>> {
 
       print('현재 위치: 위도=${position.latitude}, 경도=${position.longitude}');
 
-      // 4. VWORLD API로 좌표 -> 주소 변환 시도
-      String? address = await ref
-          .read(vworldRepositoryProvider)
-          .getAddressFromCoords(
-            lat: position.latitude,
-            lon: position.longitude,
-          );
+      String? address;
 
-      // VWORLD API 실패 시 geocoding 패키지 사용
-      if (address == null || address.isEmpty) {
-        print('VWORLD API 실패, geocoding 패키지로 재시도');
-        try {
-          List<Placemark> placemarks = await placemarkFromCoordinates(
-            position.latitude, 
-            position.longitude
-          );
-          
-          if (placemarks.isNotEmpty) {
-            Placemark place = placemarks[0];
-            
-            // 한국 주소 형식으로 조합
-            List<String> addressParts = [];
-            if (place.administrativeArea != null) addressParts.add(place.administrativeArea!);
-            if (place.locality != null) addressParts.add(place.locality!);
-            if (place.subLocality != null) addressParts.add(place.subLocality!);
-            if (place.thoroughfare != null) addressParts.add(place.thoroughfare!);
-            
-            address = addressParts.join(' ');
-            print('geocoding으로 변환된 주소: $address');
-          }
-        } catch (e) {
-          print('geocoding도 실패: $e');
+      // 먼저 geocoding 패키지로 시도 (전 세계 지원)
+      try {
+        print('geocoding 패키지로 주소 변환 시도');
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks[0];
+
+          // 주소 형식 조합
+          List<String> addressParts = [];
+          if (place.country != null) addressParts.add(place.country!);
+          if (place.administrativeArea != null)
+            addressParts.add(place.administrativeArea!);
+          if (place.locality != null) addressParts.add(place.locality!);
+          if (place.subLocality != null) addressParts.add(place.subLocality!);
+          if (place.thoroughfare != null) addressParts.add(place.thoroughfare!);
+
+          address = addressParts.join(' ');
+          print('geocoding으로 변환된 주소: $address');
+        }
+      } catch (e) {
+        print('geocoding 실패: $e');
+      }
+
+      // geocoding 실패 시 VWORLD API 시도 (한국만 지원)
+      if ((address == null || address.isEmpty) &&
+          position.latitude >= 33.0 &&
+          position.latitude <= 43.0 &&
+          position.longitude >= 124.0 &&
+          position.longitude <= 132.0) {
+        print('한국 좌표 범위 내, VWORLD API 시도');
+        address = await ref
+            .read(vworldRepositoryProvider)
+            .getAddressFromCoords(
+              lat: position.latitude,
+              lon: position.longitude,
+            );
+        if (address != null) {
+          print('VWORLD API로 변환된 주소: $address');
         }
       }
 
       if (address == null || address.isEmpty) {
         // 모든 방법이 실패한 경우 좌표로 직접 검색
         print('주소 변환 실패, 좌표로 직접 검색');
-        final fallbackKeyword = '${position.latitude.toStringAsFixed(6)},${position.longitude.toStringAsFixed(6)}';
+        final fallbackKeyword =
+            '${position.latitude.toStringAsFixed(6)},${position.longitude.toStringAsFixed(6)}';
         ref.read(searchKeywordProvider.notifier).state = fallbackKeyword;
         return;
       }
