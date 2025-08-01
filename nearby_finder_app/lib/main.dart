@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nearby_finder_app/home/home_page.dart';
+import 'package:nearby_finder_app/screens/location_search_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,10 +24,10 @@ class MyApp extends StatelessWidget {
       title: 'Nearby Finder',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: Colors.blue,
         ),
       ),
-      home: HomePage(),
+      home: LocationSearchScreen(),
     );
   }
 }

@@ -1,0 +1,125 @@
+// lib/screens/location_search_screen.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nearby_finder_app/screens/review_screen.dart';
+import '../viewmodels/location_viewmodel.dart';
+
+class LocationSearchScreen extends ConsumerStatefulWidget {
+  const LocationSearchScreen({super.key});
+
+  @override
+  ConsumerState<LocationSearchScreen> createState() =>
+      _LocationSearchScreenState();
+}
+
+class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
+  final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 뷰모델의 현재 키워드와 텍스트 필드를 동기화
+    _controller.text = ref.read(searchKeywordProvider);
+  }
+
+  void _performSearch() {
+    final keyword = _controller.text.trim();
+    if (keyword.isNotEmpty) {
+      ref.read(searchKeywordProvider.notifier).state = keyword;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final asyncValue = ref.watch(locationViewModelProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('주소 검색'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                labelText: '도로명 주소 또는 지번 주소',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+                hintText: '예: 강남대로 123',
+              ),
+              onSubmitted: (_) => _performSearch(),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: asyncValue.isLoading ? null : _performSearch,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: asyncValue.isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('검색', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: asyncValue.when(
+                data: (locations) {
+                  if (locations.isEmpty &&
+                      ref.watch(searchKeywordProvider).isNotEmpty) {
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text('검색 결과가 없습니다.', style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: locations.length,
+                    itemBuilder: (context, index) {
+                      final location = locations[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: ListTile(
+                          title: Text(location.title),
+                          subtitle: Text(location.roadAddress),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ReviewScreen(location: location),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('에러 발생: $err')),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

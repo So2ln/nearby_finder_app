@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nearby_finder_app/data/model/review.dart';
 
 class ReviewRepository {
-  final _firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance.collection('reviews');
 
   // 특정 장소의 모든 리뷰 볼러오기
-  Future<List<Review>> fetchReviews(String locationTitle) async {
+  Future<List<Review>> getReviews(String locationId) async {
     try {
       final snapshot = await _firestore
-          .collection('reviews')
-          .where('locationTitle', isEqualTo: locationTitle)
+          .where('locationId', isEqualTo: locationId)
           .orderBy('createdAt', descending: true)
           .get();
 
@@ -22,10 +22,10 @@ class ReviewRepository {
 
   // 리뷰 추가하기
   Future<void> addReview(Review review) async {
-    try {
-      await _firestore.collection('reviews').add(review.toFirestore());
-    } catch (e) {
-      print('Error adding review: $e');
-    }
+    await _firestore.add(review.toFirestore());
   }
 }
+
+final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
+  return ReviewRepository();
+});

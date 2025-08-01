@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Review {
-  final String id; // Firestore document ID
+  final String? id; // Firestore document ID
   final String content; // Review content
-  final double locationTitle; // 어떤 장소의 리뷰인지 식별하기 위해 추가
+  final String locationId; // 어떤 장소의 리뷰인지 식별하기 위해 추가
   final DateTime createdAt; // 작성 시간
 
   Review({
-    required this.id,
+    this.id,
     required this.content,
-    required this.locationTitle,
+    required this.locationId,
     required this.createdAt,
   });
 
@@ -19,7 +19,7 @@ class Review {
     return Review(
       id: doc.id,
       content: data['content'],
-      locationTitle: data['locationTitle'],
+      locationId: data['locationId'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -28,7 +28,7 @@ class Review {
   Map<String, dynamic> toFirestore() {
     return {
       'content': content,
-      'locationTitle': locationTitle,
+      'locationId': locationId,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }
