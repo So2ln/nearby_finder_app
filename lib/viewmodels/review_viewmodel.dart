@@ -18,13 +18,15 @@ class ReviewViewModel extends FamilyAsyncNotifier<List<Review>, String> {
   }
 
   // 리뷰를 추가하는 메서드
-  Future<void> addReview(String content) async {
+  Future<void> addReview(String content, int rating) async {
+    //별점 파라미터 추가
     final locationId = arg; // family로부터 받은 locationId
 
     final newReview = Review(
       content: content,
       locationId: locationId,
       createdAt: DateTime.now(),
+      rating: rating, // 별점 할당해줌
     );
 
     // 현재 상태를 로딩 중으로 업데이트--> 사용자에게 피드백을 줌

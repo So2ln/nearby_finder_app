@@ -23,9 +23,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Nearby Finder',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-        ),
+        colorScheme:
+            ColorScheme.fromSeed(
+              seedColor: const Color(0xFFffd900), // 레몬색 계열
+            ).copyWith(
+              onPrimary: const Color(
+                0xFF424242,
+              ), // 2. onPrimary 색상만 짙은 회색으로 덮어쓰기
+            ),
+        useMaterial3: true, // Material 3 디자인 사용
       ),
       home: LocationSearchScreen(),
     );
