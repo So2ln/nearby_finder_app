@@ -18,11 +18,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   // location 객체로부터 고유 ID 생성
   late final String locationId =
       "${widget.location.mapx}_${widget.location.mapy}";
+  int _rating = 5; // 기본 별점 값
 
   void _addReview() {
     final content = _reviewController.text.trim();
     if (content.isNotEmpty) {
-      ref.read(reviewViewModelProvider(locationId).notifier).addReview(content);
+      ref
+          .read(reviewViewModelProvider(locationId).notifier)
+          .addReview(content, _rating);
       _reviewController.clear();
       FocusScope.of(context).unfocus();
     }
@@ -61,14 +64,33 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   padding: const EdgeInsets.all(8.0),
                   itemCount: reviews.length,
                   itemBuilder: (context, index) {
-                    final review = reviews[index];
+                    final review = reviews.elementAt(
+                      index,
+                    ); // Review 객체 - 별점 추가하면서 변경함
                     return Card(
                       child: ListTile(
                         title: Text(review.content),
-                        subtitle: Text(
-                          DateFormat(
-                            'yyyy-MM-dd HH:mm',
-                          ).format(review.createdAt),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DateFormat(
+                                'yyyy-MM-dd HH:mm',
+                              ).format(review.createdAt),
+                            ),
+                            Row(
+                              children: List.generate(
+                                5,
+                                (starIndex) => Icon(
+                                  starIndex < review.rating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -80,34 +102,56 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   Center(child: Text('리뷰를 불러오는 중 에러 발생: $err')),
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(10),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _reviewController,
-                    decoration: InputDecoration(
-                      hintText: '리뷰를 남겨주세요.',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(
+                        index < _rating ? Icons.star : Icons.star_border,
+                        color: Colors.amber,
                       ),
+                      onPressed: () {
+                        setState(() {
+                          _rating = index + 1;
+                        });
+                      },
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _addReview,
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _reviewController,
+                        decoration: InputDecoration(
+                          hintText: '리뷰를 남겨주세요.',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _addReview,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 30),
               ],
             ),
           ),
-          const SizedBox(height: 30),
         ],
       ),
     );

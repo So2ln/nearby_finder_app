@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nearby_finder_app/data/repository/review_repository.dart';
 import 'package:nearby_finder_app/screens/review_screen.dart';
 import '../viewmodels/location_viewmodel.dart';
 
@@ -191,12 +192,57 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                     return ListView.builder(
                       itemCount: locations.length,
                       itemBuilder: (context, index) {
-                        final location = locations[index];
+                        final location = locations.elementAt(index);
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 4.0),
                           child: ListTile(
                             title: Text(location.title),
-                            subtitle: Text(location.roadAddress),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(location.roadAddress),
+                                // 별점과 리뷰 개수 추가!
+                                FutureBuilder<(double, int)>(
+                                  future: ref
+                                      .read(reviewRepositoryProvider)
+                                      .getAverageRatingAndCount(
+                                        // location.mapx와 location.mapy를 조합하여 고유 ID 생성)
+                                        "${location.mapx}_${location.mapy}",
+                                      ), //location.title을 ID로 사용하면 중복되는 불상사 생김ㅋㅎ (e.g. 스타벅스 500개)
+
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      // return const Text('평균 별점 계산 중...');
+                                      return const SizedBox.shrink(); // 로딩 중 숨김
+                                    } else if (snapshot.hasError) {
+                                      return const Text('별점 정보 오류');
+                                    } else if (snapshot.hasData) {
+                                      final (averageRating, reviewCount) =
+                                          snapshot.data!;
+                                      return Row(
+                                        children: [
+                                          Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            '${averageRating.toStringAsFixed(1)} ($reviewCount)',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return const Text('리뷰 없음');
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                             onTap: () {
                               Navigator.push(
                                 context,

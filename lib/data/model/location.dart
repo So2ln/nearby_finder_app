@@ -5,6 +5,8 @@ class Location {
   // 리뷰 페이지에서 좌표를 사용하기 위해 추가
   final String mapx;
   final String mapy;
+  double averageRating; // 평균 별점
+  int reviewCount; // 리뷰 개수
 
   Location({
     required this.title,
@@ -12,6 +14,8 @@ class Location {
     required this.roadAddress,
     required this.mapx,
     required this.mapy,
+    this.averageRating = 0.0, // 기본값 0.0
+    this.reviewCount = 0, // 기본값 0
   });
 
   // JSON(Map<String,dynamic>) 형태의 데이터를 Location 객체로 변환해주는 생성자
@@ -37,6 +41,8 @@ class Location {
       'roadAddress': roadAddress,
       'mapx': mapx,
       'mapy': mapy,
+      'averageRating': averageRating,
+      'reviewCount': reviewCount,
     };
   }
 }

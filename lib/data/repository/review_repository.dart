@@ -25,6 +25,30 @@ class ReviewRepository {
   Future<void> addReview(Review review) async {
     await _firestore.add(review.toFirestore());
   }
+
+  // (추가) 해당 장소의 평균 별점과 리뷰 개수 가져오기!
+  Future<(double, int)> getAverageRatingAndCount(String locationId) async {
+    try {
+      final snapshot = await _firestore
+          .where('locationId', isEqualTo: locationId)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return (0.0, 0); // 리뷰가 없을 경우
+      }
+
+      int totalRating = 0;
+      for (var doc in snapshot.docs) {
+        totalRating += doc.data()['rating'] as int;
+      }
+
+      double averageRating = totalRating / snapshot.docs.length;
+      return (averageRating, snapshot.docs.length);
+    } catch (e) {
+      debugPrint('Error fetching average rating: $e');
+      return (0.0, 0); // 에러 발생 시 기본값 반환
+    }
+  }
 }
 
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
