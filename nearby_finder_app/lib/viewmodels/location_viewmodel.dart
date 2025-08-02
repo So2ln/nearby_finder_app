@@ -8,7 +8,7 @@ import 'package:nearby_finder_app/data/model/location.dart';
 import 'package:nearby_finder_app/data/repository/location_repository.dart';
 import 'package:nearby_finder_app/data/repository/vworld_repository.dart';
 
-// 현재 검색 키워드를 관리하는 간단한 상태 프로바이더
+// 현재 검색 키워드를 관리하는 간단한 StateProvider
 final searchKeywordProvider = StateProvider<String>((ref) => '');
 
 // 비동기 데이터를 관리하는 주력 ViewModel
@@ -20,15 +20,36 @@ final locationViewModelProvider =
 class LocationViewModel extends AsyncNotifier<List<Location>> {
   @override
   FutureOr<List<Location>> build() {
-    // build 메서드는 초기 데이터를 반환하거나, 다른 Provider를 watch하여
-    // 해당 Provider의 값이 변경될 때마다 재실행됩니다.
-    final keyword = ref.watch(searchKeywordProvider);
-    return ref.read(locationRepositoryProvider).searchLocations(keyword);
+    // // build 메서드는 초기 데이터를 반환하거나, 다른 Provider를 watch하여
+    // // 해당 Provider의 값이 변경될 때마다 재실행? 호출됨
+    // final keyword = ref.watch(searchKeywordProvider);
+    // return ref.read(locationRepositoryProvider).searchLocations(keyword);
+
+    // build 메서드는 비어있는 초기 상태만 반환하도록 단순화하기!!!!
+    return [];
   }
 
-  // 현재 위치 검색 메서드 추가
+  // A. 키워드 검색을 위한 별도 메서드 생성
+  Future<void> searchByKeyword(String keyword) async {
+    // 키워드가 비어있으면 아무것도 하지 않음
+    if (keyword.isEmpty) return;
+
+    // 로딩 상태를 명시적으로 UI에 알림
+    state = const AsyncValue.loading();
+    try {
+      final locations = await ref
+          .read(locationRepositoryProvider)
+          .searchLocations(keyword);
+      state = AsyncValue.data(locations);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+  }
+
+  // B. 현재 위치 검색 메서드 수정
   Future<void> searchCurrentLocation() async {
-    state = const AsyncValue.loading(); // 로딩 상태로 변경
+    // 로딩 상태로 변환하여 UI에 알림
+    state = const AsyncValue.loading();
     try {
       // 1. 위치 서비스 활성화 확인
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -115,21 +136,30 @@ class LocationViewModel extends AsyncNotifier<List<Location>> {
       }
 
       if (address == null || address.isEmpty) {
-        // 모든 방법이 실패한 경우 좌표로 직접 검색
-        // print('주소 변환 실패, 좌표로 직접 검색');
-        final fallbackKeyword =
-            '${position.latitude.toStringAsFixed(6)},${position.longitude.toStringAsFixed(6)}';
-        ref.read(searchKeywordProvider.notifier).state = fallbackKeyword;
-        return;
+        // // 모든 방법이 실패한 경우 좌표로 직접 검색
+        // // print('주소 변환 실패, 좌표로 직접 검색');
+        // final fallbackKeyword =
+        //     '${position.latitude.toStringAsFixed(6)},${position.longitude.toStringAsFixed(6)}';
+        // ref.read(searchKeywordProvider.notifier).state = fallbackKeyword;
+        // return;
+
+        throw Exception('현재 위치의 주소를 찾을 수 없습니다.');
       }
 
       // print('최종 변환된 주소: $address');
 
       // 5. 변환된 주소로 네이버 API 검색
-      ref.read(searchKeywordProvider.notifier).state = address;
-    } catch (e) {
+      // ref.read(searchKeywordProvider.notifier).state = address;
+
+      // 핵심 변경: 변환된 주소로 바로 검색하고 그 결과를 state에 반영
+      // searchKeywordProvider를 업데이트하는 대신, 직접 검색 로직을 수행합니다.
+      final locations = await ref
+          .read(locationRepositoryProvider)
+          .searchLocations(address);
+      state = AsyncValue.data(locations);
+    } catch (e, s) {
       debugPrint('searchCurrentLocation 에러: $e');
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncValue.error(e, s);
     }
   }
 }
