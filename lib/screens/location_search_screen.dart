@@ -42,8 +42,8 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('주소 검색'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.gps_fixed),
@@ -75,7 +75,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: '주요 지역/건물명, 지하철역 검색',
                         labelStyle: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                         ),
                         prefixIcon: Icon(
                           Icons.explore_outlined,
-                          color: Colors.blue,
+                          color: Theme.of(context).colorScheme.primary,
                           size: 30,
                         ),
                         hintText: '예: 수원, 스타필드, 강남역',
@@ -112,7 +112,7 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                           borderSide: BorderSide(
-                            color: Colors.blue,
+                            color: Theme.of(context).colorScheme.primary,
                             width: 3.0,
                           ),
                         ),
@@ -130,11 +130,13 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                       onPressed: asyncValue.isLoading ? null : _performSearch,
                       // 버튼 스타일 지정
                       style: IconButton.styleFrom(
-                        foregroundColor: Colors.blue,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary,
 
                         // backgroundColor: Colors.blue, // 기본 배경색'
-                        side: const BorderSide(
-                          color: Colors.blue,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
                           width: 3,
                         ),
                         // shape 속성을 추가하고 RoundedRectangleBorder를 지정
@@ -147,18 +149,18 @@ class _LocationSearchScreenState extends ConsumerState<LocationSearchScreen> {
                       ),
                       // 로딩 상태에 따라 아이콘 변경
                       icon: asyncValue.isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                color: Colors.blue,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.search,
                               size: 30, // 아이콘 크기 조정
-                              color: Colors.blue, // 아이콘 색상
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                     ),
                   ),
