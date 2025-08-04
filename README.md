@@ -86,3 +86,42 @@ lib
 2.  시뮬레이터의 상단 메뉴 바에서 **Features → Location → Custom Location...** 을 선택합니다.
 3.  나타나는 팝업 창에 원하는 위치의 \*\*위도(Latitude)\*\*와 \*\*경도(Longitude)\*\*를 입력합니다. (예: 서울 시청 - 위도: `37.5665`, 경도: `126.9780`)
 4.  설정이 완료되면, 앱에서 '현재 위치로 검색' 기능을 실행했을 때 시뮬레이터에 설정된 위치를 기준으로 주변 장소를 검색합니다.
+
+-----
+
+## 빌드 및 개발 가이드
+
+### iOS 빌드 시 주의사항
+
+이 프로젝트는 Firebase 및 여러 네이티브 라이브러리를 사용하기 때문에, Xcode에서 **concurrent builds** 오류가 발생할 수 있습니다. 이는 코드의 문제가 아닌 Xcode의 시스템적 제약사항입니다.
+
+#### 해결 방법
+
+1. **권장: 빌드 스크립트 사용**
+   ```bash
+   ./build_ios.sh debug    # 디버그 빌드
+   ./build_ios.sh release  # 릴리즈 빌드
+   ```
+
+2. **수동 빌드 시**
+   ```bash
+   # 환경변수 설정 후 빌드
+   export RUN_CLANG_STATIC_ANALYZER=0 && \
+   export DISABLE_MANUAL_TARGET_ORDER_BUILD_WARNING=YES && \
+   flutter build ios --debug --no-codesign
+   ```
+
+3. **문제 지속 시**
+   ```bash
+   # 완전 클린 후 재빌드
+   flutter clean
+   rm -rf ios/Pods ios/Podfile.lock
+   flutter pub get
+   cd ios && pod install
+   ```
+
+### 적용된 최적화
+
+- **Podfile**: 병렬 빌드 비활성화, Firebase/gRPC 관련 최적화 설정
+- **Xcode Scheme**: `parallelizeBuildables = "NO"` 설정
+- **빌드 스크립트**: 자동화된 클린업 및 환경변수 설정
